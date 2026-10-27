@@ -4,10 +4,13 @@ Sorts your Liked Songs into private "Genre: ..." playlists, one niche genre per 
 (acid house, melodic house, new wave...), so each playlist holds only that genre.
 It never edits or deletes anything you already have. Everything runs on your PC.
 
+Two scripts: run_create.bat (sort_by_genre.py) sorts your Liked Songs only (steps below). spotify_playlist_sorter_full.py (run_full.bat) sorts Liked Songs AND every playlist you have: your own, ones saved from other people, and Spotify-made mixes (see "Full version" further down).
+
 ## What it can and cannot do (Spotify limits, checked October 2026)
 - CAN read your Liked Songs and create new private playlists.
 - CANNOT read the songs inside playlists through Spotify's API (returns nothing or 403),
   and cannot read artist genres from Spotify. So genres come from MusicBrainz instead.
+  The full version works around the playlist limit by reading playlist contents from the Spotify web player with scrape_playlists.js.
 - Playlists made by other people or by Spotify are blocked from the API entirely.
   Copy those by hand in the Spotify web player: open the playlist, click the first
   song, hold Shift and press Down to select all, then drag the selection onto
