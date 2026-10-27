@@ -73,6 +73,10 @@ genres with fewer than MIN_SONGS songs. To place them yourself:
 - HTTP 403 when creating a playlist: older versions used an endpoint Spotify no longer
   allows for new apps. This version creates playlists through /me/playlists. Update if
   you still see it.
+- Playlists show as public: Spotify's /me/playlists endpoint can ignore the private flag.
+  This version sets each playlist private right after creating it. If you made playlists
+  with an older version, run make_private.py once (it sets every "Genre: ..." playlist
+  you own to private).
 - Login page error "INVALID_CLIENT": the Client ID is wrong, or the Redirect URI in
   the dashboard does not match exactly.
 - Remove the app's access to your account any time: spotify.com/account/apps

@@ -56,7 +56,7 @@ if dry or not plan:
     sys.exit()
 
 sp = spotipy.Spotify(auth_manager=SpotifyPKCE(
-    scope="playlist-modify-private playlist-read-private"), requests_timeout=30, retries=5)
+    scope="playlist-modify-private playlist-modify-public playlist-read-private"), requests_timeout=30, retries=5)
 me = sp.current_user()["id"]
 existing = {}
 page = sp.current_user_playlists(limit=50)
@@ -70,6 +70,11 @@ for b, uris in plan.items():
     # Spotify retired POST /users/{id}/playlists for new apps; /me/playlists works.
     pid = existing.get(name) or sp._post("me/playlists", payload={
         "name": name, "public": False, "description": "Sorted by genre"})["id"]
+    # /me/playlists can ignore the private flag, so set it explicitly.
+    try:
+        sp._put(f"playlists/{pid}", payload={"public": False})
+    except Exception as e:
+        print(f"  (could not confirm {name} is private: {e})")
     for i in range(0, len(uris), 100):
         chunk = uris[i:i+100]
         try:
