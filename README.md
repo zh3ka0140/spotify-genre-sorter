@@ -1,2 +1,60 @@
-# spotify-genre-sorter
-Sort your Spotify Liked Songs into niche genre playlists (acid house, melodic house, new wave...). Windows launchers + Python.
+# Spotify Genre Sorter
+
+Sorts your Liked Songs into private "Genre: ..." playlists, one niche genre per song
+(acid house, melodic house, new wave...), so each playlist holds only that genre.
+It never edits or deletes anything you already have. Everything runs on your PC.
+
+## What it can and cannot do (Spotify limits, checked October 2026)
+- CAN read your Liked Songs and create new private playlists.
+- CANNOT read the songs inside playlists through Spotify's API (returns nothing or 403),
+  and cannot read artist genres from Spotify. So genres come from MusicBrainz instead.
+- Playlists made by other people or by Spotify are blocked from the API entirely.
+  Copy those by hand in the Spotify web player: open the playlist, click the first
+  song, hold Shift and press Down to select all, then drag the selection onto
+  your genre playlist in the left sidebar.
+- Genres are per ARTIST, not per song, so some songs will land in the wrong genre.
+  Check song_genres.csv and fix it before creating playlists.
+
+## One-time setup
+1. Install Python from python.org (tick "Add python.exe to PATH").
+2. Go to developer.spotify.com/dashboard, Create app, any name, and add this
+   Redirect URI exactly:  http://127.0.0.1:8888/callback
+3. Copy client_id.txt.example to client_id.txt and put your app's Client ID on the first line.
+   (The Client ID is public. No secret is needed or used.)
+
+## Every time (double-click in this order)
+1. run_dry.bat      Reads your Liked Songs (read-only) and writes preview_songs.csv.
+                    The first time, a browser tab opens: click Agree.
+2. run_lookup.bat   Looks up each artist's genre on MusicBrainz and writes
+                    song_genres.csv and genre_summary.txt. About 15-25 minutes.
+                    Safe to close and re-run: it resumes from artist_genres.json.
+3. Open song_genres.csv in Excel. Column "bucket" is the playlist each song goes to.
+   Edit buckets you disagree with. Anything "Unsorted" is skipped by default.
+4. run_create.bat   Shows a preview, then asks you to type YES before creating
+                    private "Genre: ..." playlists. Re-running only adds missing songs.
+
+## Tuning
+- Minimum songs per genre playlist: MIN_SONGS near the top of lookup_genres.py
+  (default 8). Smaller genres go to Unsorted. Lower it for more niche playlists.
+- Add genre names to the GENRES list in lookup_genres.py to recognise more of them.
+
+## Troubleshooting
+- "Python is not installed": do setup step 1, then re-run.
+- HTTP 403 in a log: Spotify blocked that item. It is skipped, nothing is damaged.
+- Login page error "INVALID_CLIENT": the Client ID is wrong, or the Redirect URI in
+  the dashboard does not match exactly.
+- Remove the app's access to your account any time: spotify.com/account/apps
+- Delete the .cache file to force a fresh Spotify login.
+- Logs: run_log.txt, lookup_log.txt, create_log.txt.
+
+## Optional
+- contact.txt: put an email or URL on one line to identify yourself to MusicBrainz
+  (their API etiquette). If absent, a generic name is sent. Never committed to git.
+
+## Privacy
+This repo contains no personal data. Your Client ID, login cache, song lists and
+results stay on your PC and are listed in .gitignore.
+
+## Disclaimer
+Unofficial hobby tool, not affiliated with Spotify or MusicBrainz. Use at your own risk.
+Genres come from community tags on MusicBrainz and will not always be right.

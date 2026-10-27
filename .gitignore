@@ -1,0 +1,13 @@
+# personal data and secrets - never commit these
+client_id.txt
+contact.txt
+.cache
+.cache-*
+preview_songs.csv
+preview_summary.txt
+song_genres.csv
+genre_summary.txt
+artist_genres.json
+*_log*.txt
+__pycache__/
+*.pyc
