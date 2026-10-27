@@ -8,6 +8,8 @@ preview_summary.txt
 song_genres.csv
 genre_summary.txt
 artist_genres.json
+created_state.json
+manual_overrides.csv
 *_log*.txt
 __pycache__/
 *.pyc

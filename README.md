@@ -26,12 +26,40 @@ It never edits or deletes anything you already have. Everything runs on your PC.
 1. run_dry.bat      Reads your Liked Songs (read-only) and writes preview_songs.csv.
                     The first time, a browser tab opens: click Agree.
 2. run_lookup.bat   Looks up each artist's genre on MusicBrainz and writes
-                    song_genres.csv and genre_summary.txt. About 15-25 minutes.
-                    Safe to close and re-run: it resumes from artist_genres.json.
+                    song_genres.csv and genre_summary.txt. Allow roughly an hour for
+                    about 900 artists (MusicBrainz answers about one request every 3-4
+                    seconds). Safe to close and re-run: it resumes from artist_genres.json.
 3. Open song_genres.csv in Excel. Column "bucket" is the playlist each song goes to.
    Edit buckets you disagree with. Anything "Unsorted" is skipped by default.
-4. run_create.bat   Shows a preview, then asks you to type YES before creating
-                    private "Genre: ..." playlists. Re-running only adds missing songs.
+4. (Optional) Hand-sort the Unsorted songs, see "Sorting leftovers by hand" below.
+5. run_create.bat   Shows a preview, then asks you to type YES before creating
+                    private "Genre: ..." playlists.
+
+Re-running run_create.bat is safe: songs it already added are remembered in
+created_state.json and are skipped, so you can fix more buckets later and run it again
+to add only the new songs. Delete a "Genre: ..." playlist in Spotify and you should also
+delete its entry in created_state.json (or the whole file) before re-running.
+
+## Sorting leftovers by hand
+Songs whose artist has no usable genre tag on MusicBrainz end up "Unsorted", and so do
+genres with fewer than MIN_SONGS songs. To place them yourself:
+1. Open genre_summary.txt / song_genres.csv and look at the Unsorted rows.
+2. Copy manual_overrides.csv.example to manual_overrides.csv and list one artist per line
+   with the playlist name you want, for example:
+
+       artist,bucket
+       Hardfloor,Acid House
+       Kino,Russian Rock
+
+   The match is on the FIRST artist of a song (case-insensitive). An override wins over
+   the bucket in song_genres.csv, so you can also use it to correct wrong genres.
+3. Run run_create.bat (or `python create_playlists_from_csv.py --dry` to preview).
+   New genre names create new playlists automatically.
+
+## Command line options (create_playlists_from_csv.py)
+- --dry                preview only, create nothing
+- --include-unsorted   also make a "Genre: Unsorted" playlist
+- --overrides FILE     use a different overrides file (default: manual_overrides.csv)
 
 ## Tuning
 - Minimum songs per genre playlist: MIN_SONGS near the top of lookup_genres.py
@@ -40,7 +68,11 @@ It never edits or deletes anything you already have. Everything runs on your PC.
 
 ## Troubleshooting
 - "Python is not installed": do setup step 1, then re-run.
-- HTTP 403 in a log: Spotify blocked that item. It is skipped, nothing is damaged.
+- HTTP 403 when reading playlists or artists: Spotify blocks that item. It is skipped,
+  nothing is damaged.
+- HTTP 403 when creating a playlist: older versions used an endpoint Spotify no longer
+  allows for new apps. This version creates playlists through /me/playlists. Update if
+  you still see it.
 - Login page error "INVALID_CLIENT": the Client ID is wrong, or the Redirect URI in
   the dashboard does not match exactly.
 - Remove the app's access to your account any time: spotify.com/account/apps
@@ -52,8 +84,8 @@ It never edits or deletes anything you already have. Everything runs on your PC.
   (their API etiquette). If absent, a generic name is sent. Never committed to git.
 
 ## Privacy
-This repo contains no personal data. Your Client ID, login cache, song lists and
-results stay on your PC and are listed in .gitignore.
+This repo contains no personal data. Your Client ID, login cache, song lists, overrides
+and results stay on your PC and are listed in .gitignore.
 
 ## Disclaimer
 Unofficial hobby tool, not affiliated with Spotify or MusicBrainz. Use at your own risk.
