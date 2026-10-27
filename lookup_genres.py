@@ -65,13 +65,19 @@ def main():
     artists = sorted({r["artists"].split(", ")[0].strip() for r in rows if r["song"] and r["artists"]})
     todo = [a for a in artists if a not in cache]
     print(f"{len(artists)} artists, {len(todo)} to look up (~{len(todo)//60 + 1} min)", flush=True)
-    for i, a in enumerate(todo, 1):
+    # 3 workers, each waiting ~3 s after a request: about 1 request/second overall,
+    # which is MusicBrainz's limit, but without idling while each answer is in flight.
+    from concurrent.futures import ThreadPoolExecutor
+    def work(a):
         res = fetch(a)
-        if res is not None: cache[a] = res
-        if i % 20 == 0:
-            json.dump(cache, open(CACHE, "w", encoding="utf-8"))
-            print(f"  {i}/{len(todo)}", flush=True)
-        time.sleep(1.1)
+        time.sleep(3.0)
+        return a, res
+    with ThreadPoolExecutor(max_workers=3) as ex:
+        for i, (a, res) in enumerate(ex.map(work, todo), 1):
+            if res is not None: cache[a] = res
+            if i % 20 == 0:
+                json.dump(cache, open(CACHE, "w", encoding="utf-8"))
+                print(f"  {i}/{len(todo)}", flush=True)
     json.dump(cache, open(CACHE, "w", encoding="utf-8"))
 
     for r in rows:

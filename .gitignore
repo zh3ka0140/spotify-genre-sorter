@@ -13,3 +13,7 @@ manual_overrides.csv
 *_log*.txt
 __pycache__/
 *.pyc
+playlists_scraped.json
+Playlist1.json
+preview_songs_*.csv
+song_genres_*.csv

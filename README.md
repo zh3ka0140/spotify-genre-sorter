@@ -56,6 +56,26 @@ genres with fewer than MIN_SONGS songs. To place them yourself:
 3. Run run_create.bat (or `python create_playlists_from_csv.py --dry` to preview).
    New genre names create new playlists automatically.
 
+## Full version: Liked Songs AND every playlist (spotify_playlist_sorter_full.py)
+The first script only sees Liked Songs. The full version also sorts your own playlists,
+playlists you saved from other people, and Spotify-made mixes and radios.
+Spotify's API will not hand over the songs inside playlists, so playlist contents come
+from a file instead:
+1. Open https://open.spotify.com in Chrome or Edge and sign in.
+2. Press F12, open the Console tab (if asked, type: allow pasting), paste the whole of
+   scrape_playlists.js and press Enter. Leave the tab in front. It opens each playlist in
+   your library and reads the song list (read-only). About 10-30 minutes for a big library.
+3. When the console says DONE, playlists_scraped.json is in your Downloads folder. Move it
+   into this folder. (Your own playlists can instead come from Spotify's "Download your
+   data" export: put Playlist1.json here and it is picked up automatically.)
+4. Double-click run_full.bat. It reads Liked Songs through the API, merges every playlist
+   (each song once, however many playlists it is in), looks up genres, shows a preview and
+   asks you to type YES before creating the private "Genre: ..." playlists.
+Running it again later only adds songs it has not placed before (created_state.json).
+Hand-sorting leftovers with manual_overrides.csv works the same way as above.
+Good to know: copied playlists are by song, not by playlist, so a song that appears in
+three playlists ends up in just one genre playlist. Playlists named "Genre: ..." are skipped.
+
 ## Command line options (create_playlists_from_csv.py)
 - --dry                preview only, create nothing
 - --include-unsorted   also make a "Genre: Unsorted" playlist
